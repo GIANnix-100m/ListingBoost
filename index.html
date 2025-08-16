@@ -351,44 +351,6 @@
       <div class="card" style="padding:18px">
         <h3 style="margin-top:0">Guarantee</h3>
         <p class="muted">Try ListingBoost Pro for a full month. If it doesn’t dramatically cut your writing time and improve your listings, simply email our support team for a no-questions-asked full refund. Your investment is protected from day one.</p>
-      </div>
-    </section>
-
-    <div class="bar"></div>
-
-    <section class="faq">
-      <h2 style="text-align:center; margin-bottom: 2rem;">Frequently Asked Questions</h2>
-      <details>
-        <summary>What is ListingBoost Pro?</summary>
-        <p class="muted">ListingBoost Pro is an AI-powered tool designed for real estate agents to quickly generate high-quality property descriptions for various marketing channels, including MLS, social media, and email.</p>
-      </details>
-      <details>
-        <summary>How does the URL import feature work?</summary>
-        <p class="muted">The URL import feature (currently simulated for MVP) allows you to paste a link from real estate websites like Zillow or MLS. In a full version, the AI would scrape key property details from the page to pre-fill your form, saving you time. For this demo, it populates fields with example data.</p>
-      </details>
-      <details>
-        <summary>Is there a recurring fee?</summary>
-        <p class="muted">No! ListingBoost Pro is a **one-time payment** product. Pay $47 once, and get lifetime access to all current and future features. There are no subscriptions or hidden fees.</p>
-      </details>
-      <details>
-        <summary>What is the 3-generation trial?</summary>
-        <p class="muted">To let you experience the power of ListingBoost Pro, we offer a free trial that allows you to generate up to 3 listings. After the trial, you'll be prompted to unlock lifetime access with a one-time payment.</p>
-      </details>
-      <details>
-        <summary>What kind of AI is used for generation?</summary>
-        <p class="muted">ListingBoost Pro leverages advanced large language models, specifically the Gemini 2.5 Flash API, to understand your property details and generate compelling, contextually relevant marketing copy.</p>
-      </details>
-      <details>
-        <summary>Can I export the generated listings?</summary>
-        <p class="muted">Yes! You can easily copy any generated text to your clipboard or download it as a plain text (.txt) file. We also provide an "Export All" option to download all three formats at once, and an "Export CSV" for the property's basic details.</p>
-      </details>
-      <details>
-        <summary>Is my data saved?</summary>
-        <p class="muted">Your form input is **auto-saved locally** in your browser's storage. This means if you close and reopen the app on the same device, your progress will be there. We do not store your property data on our servers for this version.</p>
-      </details>
-      <details>
-        <summary>What if I'm not satisfied?</summary>
-        <p class="muted">We offer a **30-day money-back guarantee**. If ListingBoost Pro doesn’t meet your expectations or significantly improve your workflow within the first 30 days of purchase, contact our support for a full refund. No questions asked!</p>
       </details>
     </section>
 
@@ -777,10 +739,8 @@
                 toggleLoading(true);
 
                 try {
-                    // This `fetch` call points to your Vercel serverless function (`api/scrape-url.js`).
-                    // For a real setup, ensure this backend function is deployed on Vercel.
-                    // For demo purposes, we'll always use mock data here.
-                    const response = await fetch('/api/scrape-url', {
+                    // This `fetch` call now uses window.location.origin for robustness
+                    const response = await fetch(window.location.origin + '/api/scrape-url', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ url: url })

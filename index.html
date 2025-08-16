@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ListingBoost Pro — AI Listing Generator</title>
+    <meta name="description" content="Generate polished real estate listings instantly from URLs, uploaded files, or a quick form. Pay once, enjoy lifetime access." />
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0b1220">
+    <!-- Using /assets/logo.svg as intended. Ensure this file exists in your deployment. -->
+    <!-- If /assets/logo.svg is not available, the JavaScript below will fall back to a placeholder. -->
+    <link rel="icon" href="/assets/logo.svg">
+    <meta property="og:title" content="ListingBoost Pro — AI Listing Generator">
+    <meta property="og:description" content="AI-powered descriptions for MLS, Social Media, and Email in seconds. One-time $47 purchase, lifetime access guaranteed.">
+    <meta property="og:type" content="website">
+    <!-- IMPORTANT: Replace YOUR_PAYPAL_CLIENT_ID with your actual PayPal client ID -->
+    <script src="https://www.paypal.com/sdk/js?client-id=Ab17o-t9M3V5LGj0G940YSukgyEO6JhjeSaAbWEWvSZrVjgpaEbm0p6RXjFNJ4aZDzU6udgfIHkHW7FO&currency=USD"></script>
+    <style>
+        /* CSS Variables based on the new design system */
+        :root{ --bg:#0b1220; --card:#0f172a; --acc:#7dd3fc; --acc2:#a78bfa; --text:#e5e7eb; --muted:#cbd5e1; }
+        * {box-sizing: border-box;}
+        body {
+            margin: 0;
+            font: 16px/1.6 system-ui,Segoe UI,Roboto,Helvetica,Arial;
+            background: radial-gradient(1200px 800px at 10% -10%,#1f2937 0,#0b1220 50%,#0b1220 100%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Align content to the top */
+            align-items: center;
+            overflow-x: hidden;
+        }
+        .wrap {
+            max-width: 1150px;
+            margin: 0 auto;
+            padding: 28px;
+            width: 100%; /* Ensure wrap takes full width */
+        }
+        .grid {display: grid; gap: 18px;}
+        .grid-2 {grid-template-columns: 1fr 1fr;}
+        .grid-3 {grid-template-columns: repeat(3, 1fr);}
+        .card {
+            background: linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+            border: 1px solid rgba(255,255,255,.08);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 22px 65px rgba(0,0,0,.35);
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions */
+        }
+        .card:hover {
+            transform: translateY(-3px); /* Slight lift on hover */
+            box-shadow: 0 28px 80px rgba(0,0,0,.45); /* Enhanced shadow */
+        }
+        .btn {
+            cursor: pointer;
+            border: 0;
+            border-radius: 12px;
+            padding: 13px 16px;
+            background: linear-gradient(135deg, var(--acc2), var(--acc));
+            color: #0b1220;
+            font-weight: 700;
+            transition: opacity .2s, transform .2s, box-shadow .2s;
+            white-space: nowrap; /* Prevent text wrapping */
+        }
+        .btn:hover {opacity: .9; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,.2);}
+        .btn.secondary {background: transparent; color: var(--text); border: 1px solid rgba(255,255,255,.2);}
+        .btn.secondary:hover {background: rgba(255,255,255,.05);}
+        .input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,.15);
+            background: rgba(255,255,255,.05);
+            color: var(--text);
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+        .input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--acc);
+            background: rgba(255,255,255,.1);
+        }
+        textarea {min-height: 130px; resize: vertical;}
+        .muted {color: var(--muted); font-size: 14px;}
+        .bar {height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent); margin: 26px 0;}
+        .faq details {
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 12px;
+            padding: 12px;
+            background: rgba(255,255,255,.04);
+            margin-bottom: 10px; /* Space between FAQ items */
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .faq details:hover {
+            background: rgba(255,255,255,.06);
+        }
+        .faq summary {
+            font-weight: 600;
+            color: var(--acc);
+            padding: 5px 0;
+        }
+        .faq p {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,.1);
+        }
+        .badge {
+            display: inline-block;
+            padding: 7px 11px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,.15);
+            background: rgba(255,255,255,.05);
+            font-size: 12px;
+            color: #c7d2fe;
+        }
+        /* Custom styles for messages */
+        .message {
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.9em;
+            text-align: center;
+            display: none; /* Hidden by default */
+        }
+        .message.info {
+            background-color: rgba(125, 211, 252, 0.1); /* light blue */
+            color: var(--acc);
+            border: 1px solid var(--acc);
+        }
+        .message.error {
+            background-color: rgba(252, 165, 165, 0.1); /* light red */
+            color: #ef4444;
+            border: 1px solid #ef4444;
+        }
+        .message.success {
+            background-color: rgba(134, 239, 172, 0.1); /* light green */
+            color: #22c55e;
+            border: 1px solid #22c55e;
+        }
+
+        /* Loading Overlay */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        #loading-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid var(--acc);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+            .wrap {
+                padding: 18px;
+            }
+            header .grid {
+                grid-template-columns: 1fr; /* Stack header items vertically */
+                text-align: center;
+            }
+            header nav {
+                justify-content: center;
+            }
+            .btn-group {
+                flex-direction: column; /* Stack buttons on small screens */
+            }
+            .btn {
+                width: 100%; /* Full width buttons */
+            }
+            #paywallCard {
+                order: -1; /* Place paywall card above hero text on small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+  <!-- Loading Overlay -->
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+
+  <div class="wrap">
+    <header class="grid" style="grid-template-columns:auto 1fr auto;align-items:center;gap:12px;margin-bottom:12px">
+      <!-- Logo: Attempt to load from /assets/logo.svg, fallback handled by JS -->
+      <div style="display:flex;align-items:center;gap:10px"><img id="logo-img" src="/assets/logo.svg" alt="logo" width="34" height="34"><strong>ListingBoost Pro</strong></div>
+      <div class="muted" id="utmNote"></div>
+      <nav style="display:flex;gap:14px">
+          <!-- Linking to actual placeholder files for Privacy and Terms -->
+          <a class="muted" href="/privacy.html">Privacy</a>
+          <a class="muted" href="/terms.html">Terms</a>
+      </nav>
+    </header>
+
+    <section class="grid" style="grid-template-columns:1.2fr .8fr;gap:20px;align-items:center">
+      <div>
+        <span class="badge">One-time $47 • Lifetime Access • 30-Day Guarantee</span>
+        <h1 style="margin:10px 0 8px">AI Listing Generator</h1>
+        <p class="muted">Quickly transform raw property information into beautifully written, market-ready listings. Choose your input method: paste a URL, upload documents or images, or fill out a simple form. Within seconds, you’ll have compelling copy tailored for MLS, social platforms, and email campaigns.</p>
+        <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+          <button class="btn" id="scrollToApp">Generate Demo Listing <span id="trial-hint" style="font-size: 0.8em; opacity: 0.8;">(3 free left)</span></button>
+          <button class="btn secondary" id="resetPayment">Start Fresh</button>
+        </div>
+      </div>
+      <aside class="card" style="padding:20px" id="paywallCard">
+        <h3 style="margin:8px 0 8px" id="paywallTitle">Unlock Lifetime Access</h3>
+        <p class="muted" style="margin:0 0 10px" id="paywallDesc">Secure checkout via PayPal. Activation is instant and linked directly to your browser for seamless use.</p>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap" id="couponSection">
+          <input class="input" id="coupon" placeholder="Coupon (optional)" style="max-width:220px">
+          <button class="btn secondary" id="applyCoupon">Apply</button>
+          <span class="muted" id="couponMsg"></span>
+        </div>
+        <div id="paypal-button-container"></div>
+        <p class="muted" style="margin:14px 0 0" id="guaranteeText">30-day money-back guarantee. Try without risk.</p>
+      </aside>
+    </section>
+
+    <div class="bar"></div>
+
+    <section class="card" id="app" style="display:block;padding:18px"> <!-- Changed to display:block for initial demo -->
+      <div class="grid grid-3">
+        <div>
+          <h3 style="margin:0 0 8px">1) Import From URL</h3>
+          <p class="muted">Paste an MLS or Zillow property URL and simulate an instant scrape of core details (demo only for MVP).</p>
+          <div style="display:flex;gap:10px">
+            <input class="input" id="urlInput" placeholder="https://www.zillow.com/homedetails/..." />
+            <button class="btn" id="btnScrape">Import</button>
+          </div>
+          <p id="urlStatus" class="muted message"></p>
+        </div>
+        <div>
+          <h3 style="margin:0 0 8px">2) Upload Files</h3>
+          <div id="drop" style="border:1px dashed rgba(255,255,255,.25);padding:18px;border-radius:16px;text-align:center">Drag & drop photos, PDFs, or documents here, or click to select<input type="file" id="fileInput" multiple style="display:none"/></div>
+          <div id="fileList" class="muted" style="margin-top:10px"></div>
+          <p id="fileUploadStatus" class="muted message"></p>
+        </div>
+        <div>
+          <h3 style="margin:0 0 8px">3) Property Basics</h3>
+          <div class="grid grid-2">
+            <input class="input" id="address" name="address" placeholder="123 Main St, City, ST" />
+            <input class="input" id="price" name="price" placeholder="$450,000" />
+            <input class="input" id="bedrooms" name="bedrooms" placeholder="3" />
+            <input class="input" id="bathrooms" name="bathrooms" placeholder="2" />
+            <input class="input" id="sqft" name="sqft" placeholder="1,850" />
+            <select class="input" id="propertyType" name="propertyType">
+              <option value="Single Family">Single Family</option>
+              <option value="Condo">Condo</option>
+              <option value="Townhouse">Townhouse</option>
+              <option value="Multi-Family">Multi-Family</option>
+              <option value="Land">Land</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:18px">
+        <h3 style="margin:0 0 8px">Detailed Features</h3>
+        <div class="grid grid-3">
+          <textarea id="features" name="features" placeholder="E.g., open-concept kitchen, quartz counters, hardwood floors..."></textarea>
+          <textarea id="highlights" name="highlights" placeholder="Top 5 selling points, neighborhood advantages, nearby schools..."></textarea>
+          <textarea id="notes" name="notes" placeholder="Private notes or extended remarks to enrich the long description..."></textarea>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap" class="btn-group">
+          <button class="btn" id="btnGenerate">Generate Listings</button>
+          <button class="btn secondary" id="btnExportAll">Export All (.txt)</button>
+          <button class="btn secondary" id="btnExportCSV">Export CSV (details)</button>
+          <span class="muted" id="autosaveState">💾 Auto-saved</span>
+          <p id="generationStatus" class="muted message"></p>
+        </div>
+      </div>
+
+      <div class="bar"></div>
+
+      <div class="grid">
+        <article class="card" style="padding:14px">
+          <header style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+            <div><div style="font-size:13px;letter-spacing:.08em;color:#93c5fd;text-transform:uppercase">Format A</div><h3 style="margin:5px 0 0">MLS Description</h3></div>
+            <div>
+              <button class="btn secondary" data-copy="#outMLS">Copy</button>
+              <button class="btn secondary" data-download="#outMLS" data-filename="listing-mls.txt">Download</button>
+            </div>
+          </header>
+          <textarea id="outMLS" readonly></textarea>
+        </article>
+        <article class="card" style="padding:14px">
+          <header style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+            <div><div style="font-size:13px;letter-spacing:.08em;color:#93c5fd;text-transform:uppercase">Format B</div><h3 style="margin:5px 0 0">Social Caption</h3></div>
+            <div>
+              <button class="btn secondary" data-copy="#outSocial">Copy</button>
+              <button class="btn secondary" data-download="#outSocial" data-filename="listing-social.txt">Download</button>
+            </div>
+          </header>
+          <textarea id="outSocial" readonly></textarea>
+        </article>
+        <article class="card" style="padding:14px">
+          <header style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+            <div><div style="font-size:13px;letter-spacing:.08em;color:#93c5fd;text-transform:uppercase">Format C</div><h3 style="margin:5px 0 0">Email Blast</h3></div>
+            <div>
+              <button class="btn secondary" data-copy="#outEmail">Copy</button>
+              <button class="btn secondary" data-download="#outEmail" data-filename="listing-email.txt">Download</button>
+            </div>
+          </header>
+          <textarea id="outEmail" readonly></textarea>
+        </article>
+      </div>
+    </section>
+
+    <div class="bar"></div>
+
+    <section class="grid grid-3">
+      <div class="card" style="padding:18px">
+        <h3 style="margin-top:0">Why Agents Love It</h3>
+        <ul class="muted" style="margin:0 0 0 20px">
+          <li>Fast imports from property URLs or file uploads</li>
+          <li>Three instantly usable content formats</li>
+          <li>One-time affordable payment with lifetime use</li>
+          <li>Clean, distraction-free interface</li>
+        </ul>
+      </div>
+      <div class="card" style="padding:18px">
+        <h3 style="margin-top:0">Testimonials</h3>
+        <p class="muted">“Cut my listing prep from 45 minutes to just 4. It feels like I hired a virtual assistant.” — Alex R.</p>
+        <p class="muted">“Finally, social captions that grab attention and drive clicks without extra editing.” — Priya M.</p>
+        <p class="muted">“Worth every penny. Saved me hours in my first week.” — Jamal T.</p>
+      </div>
+      <div class="card" style="padding:18px">
+        <h3 style="margin-top:0">Guarantee</h3>
+        <p class="muted">Try ListingBoost Pro for a full month. If it doesn’t dramatically cut your writing time and improve your listings, simply email our support team for a no-questions-asked full refund. Your investment is protected from day one.</p>
+      </div>
+    </section>
+
+    <div class="bar"></div>
+
+    <section class="faq">
+      <h2 style="text-align:center; margin-bottom: 2rem;">Frequently Asked Questions</h2>
+      <details>
+        <summary>What is ListingBoost Pro?</summary>
+        <p class="muted">ListingBoost Pro is an AI-powered tool designed for real estate agents to quickly generate high-quality property descriptions for various marketing channels, including MLS, social media, and email.</p>
+      </details>
+      <details>
+        <summary>How does the URL import feature work?</summary>
+        <p class="muted">The URL import feature (currently simulated for MVP) allows you to paste a link from real estate websites like Zillow or MLS. In a full version, the AI would scrape key property details from the page to pre-fill your form, saving you time. For this demo, it populates fields with example data.</p>
+      </details>
+      <details>
+        <summary>Is there a recurring fee?</summary>
+        <p class="muted">No! ListingBoost Pro is a **one-time payment** product. Pay $47 once, and get lifetime access to all current and future features. There are no subscriptions or hidden fees.</p>
+      </details>
+      <details>
+        <summary>What is the 3-generation trial?</summary>
+        <p class="muted">To let you experience the power of ListingBoost Pro, we offer a free trial that allows you to generate up to 3 listings. After the trial, you'll be prompted to unlock lifetime access with a one-time payment.</p>
+      </details>
+      <details>
+        <summary>What kind of AI is used for generation?</summary>
+        <p class="muted">ListingBoost Pro leverages advanced large language models, specifically the Gemini 2.5 Flash API, to understand your property details and generate compelling, contextually relevant marketing copy.</p>
+      </details>
+      <details>
+        <summary>Can I export the generated listings?</summary>
+        <p class="muted">Yes! You can easily copy any generated text to your clipboard or download it as a plain text (.txt) file. We also provide an "Export All" option to download all three formats at once, and an "Export CSV" for the property's basic details.</p>
+      </details>
+      <details>
+        <summary>Is my data saved?</summary>
+        <p class="muted">Your form input is **auto-saved locally** in your browser's storage. This means if you close and reopen the app on the same device, your progress will be there. We do not store your property data on our servers for this version.</p>
+      </details>
+      <details>
+        <summary>What if I'm not satisfied?</summary>
+        <p class="muted">We offer a **30-day money-back guarantee**. If ListingBoost Pro doesn’t meet your expectations or significantly improve your workflow within the first 30 days of purchase, contact our support for a full refund. No questions asked!</p>
+      </details>
+    </section>
+
+    <div class="bar"></div>
+
+    <footer style="text-align:center;padding-bottom:20px;">
+      <p class="muted">© 2025 ListingBoost Pro. All rights reserved.</p>
+    </footer>
+  </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Utility Functions ---
+            /**
+             * showMessage: Displays a temporary message in a specified DOM element.
+             * @param {HTMLElement} element - The DOM element to display the message in (e.g., a div).
+             * @param {string} message - The message text to display.
+             * @param {string} type - 'info', 'success', or 'error' to apply specific styling.
+             * @param {number} duration - How long to show the message in milliseconds (default: 3000ms).
+             */
+            function showMessage(element, message, type, duration = 3000) {
+                element.textContent = message;
+                element.className = `message ${type}`; // Apply 'message' base class and specific type
+                element.style.display = 'block';
+                setTimeout(() => {
+                    element.style.display = 'none';
+                }, duration);
+            }
+
+            /**
+             * toggleLoading: Shows or hides a full-screen loading overlay with a spinner.
+             * @param {boolean} show - True to show the overlay, false to hide it.
+             */
+            function toggleLoading(show) {
+                const loadingOverlay = document.getElementById('loading-overlay');
+                if (show) {
+                    loadingOverlay.classList.add('visible');
+                } else {
+                    loadingOverlay.classList.remove('visible');
+                }
+            }
+
+            /**
+             * scrollToElement: Smoothly scrolls to a given element.
+             * @param {HTMLElement} element - The DOM element to scroll to.
+             */
+            function scrollToElement(element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+
+            // --- DOM Elements ---
+            const paywallCard = document.getElementById('paywallCard');
+            const paywallTitle = document.getElementById('paywallTitle');
+            const paywallDesc = document.getElementById('paywallDesc');
+            const paypalButtonContainer = document.getElementById('paypal-button-container');
+            const appSection = document.getElementById('app');
+            const scrollToAppBtn = document.getElementById('scrollToApp');
+            const resetPaymentBtn = document.getElementById('resetPayment');
+            const trialHintSpan = document.getElementById('trial-hint'); // New span for trial hint
+
+            const couponInput = document.getElementById('coupon');
+            const applyCouponBtn = document.getElementById('applyCoupon');
+            const couponMsg = document.getElementById('couponMsg');
+            const couponSection = document.getElementById('couponSection');
+
+            const urlInput = document.getElementById('urlInput');
+            const btnScrape = document.getElementById('btnScrape');
+            const urlStatus = document.getElementById('urlStatus');
+
+            const dropZone = document.getElementById('drop');
+            const fileInput = document.getElementById('fileInput');
+            const fileListDiv = document.getElementById('fileList');
+            const fileUploadStatus = document.getElementById('fileUploadStatus');
+
+            const addressInput = document.getElementById('address');
+            const priceInput = document.getElementById('price');
+            const bedroomsInput = document.getElementById('bedrooms');
+            const bathroomsInput = document.getElementById('bathrooms');
+            const sqftInput = document.getElementById('sqft');
+            const propertyTypeSelect = document.getElementById('propertyType');
+            const featuresTextarea = document.getElementById('features');
+            const highlightsTextarea = document.getElementById('highlights');
+            const notesTextarea = document.getElementById('notes');
+
+            const btnGenerate = document.getElementById('btnGenerate');
+            const btnExportAll = document.getElementById('btnExportAll');
+            const btnExportCSV = document.getElementById('btnExportCSV');
+            const autosaveStateSpan = document.getElementById('autosaveState');
+            const generationStatus = document.getElementById('generationStatus');
+
+            const outMLS = document.getElementById('outMLS');
+            const outSocial = document.getElementById('outSocial');
+            const outEmail = document.getElementById('outEmail');
+
+            const utmNote = document.getElementById('utmNote');
+            const logoImg = document.getElementById('logo-img'); // Get the logo image element
+
+            // --- State Variables ---
+            const INITIAL_TRIAL_COUNT = 3;
+            let generationCount = parseInt(localStorage.getItem('listingBoostProGenerations')) || 0;
+            let hasPaid = localStorage.getItem('listingBoostProPaid') === 'true';
+            let uploadedFiles = []; // Array to store file objects (for mock analysis)
+            const formFields = document.querySelectorAll('#app .input, #app textarea, #app select'); // Select all input fields for auto-save
+
+            // --- Default Example Property Data for Demo ---
+            const defaultPropertyData = {
+                address: '123 Coastal View Dr, Ocean City, CA 90210',
+                price: '950000',
+                bedrooms: '4',
+                bathrooms: '3',
+                sqft: '2500',
+                propertyType: 'Single Family',
+                features: 'Stunning ocean views, gourmet kitchen with quartz countertops, stainless steel appliances, open-concept living, master suite with spa-like bath, hardwood floors throughout, large deck perfect for entertaining, private beach access, smart home ready.',
+                highlights: 'Located in a prestigious beachfront community, walking distance to vibrant downtown shops and restaurants, top-rated schools nearby, excellent for outdoor activities like surfing and hiking, strong community feel.',
+                notes: 'Built in 2020, modern architecture, energy-efficient windows, ample storage, two-car garage. Furniture negotiable.'
+            };
+
+            // --- PWA Service Worker Registration ---
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    // Fallback for logo if /assets/logo.svg is not found in the Vercel deployment
+                    // This function now uses the actual logoImg element directly
+                    const img = new Image();
+                    img.onload = () => { /* logo.svg loaded, no fallback needed */ };
+                    img.onerror = () => {
+                        // If logo.svg fails to load, use a placeholder
+                        if (logoImg) {
+                            logoImg.src = 'https://placehold.co/34x34/7dd3fc/0b1220?text=LB';
+                        }
+                    };
+                    // Ensure img.src is set only if logoImg exists and has a src
+                    if (logoImg && logoImg.src) {
+                        img.src = logoImg.src; // Trigger load/error
+                    }
+
+
+                    navigator.serviceWorker.register('/service-worker.js').then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    }).catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+                });
+            }
+
+
+            // --- PayPal Payment Gate Logic ---
+            /**
+             * updatePaywallUI: Updates the content and visibility of the paywall card based on payment/trial status.
+             */
+            function updatePaywallUI() {
+                if (hasPaid) {
+                    paywallTitle.textContent = 'Welcome Back to ListingBoost Pro!';
+                    paywallDesc.innerHTML = 'You have **lifetime access** to our AI-powered real estate listing generator. Enjoy unlimited generations!';
+                    paypalButtonContainer.style.display = 'none'; // Hide PayPal buttons
+                    couponSection.style.display = 'none'; // Hide coupon section
+                    paywallCard.style.display = 'block'; // Ensure card is visible even if just a welcome message
+                    appSection.style.display = 'block'; // Show the main app
+                    scrollToElement(appSection); // Scroll to the app section immediately
+                    trialHintSpan.textContent = ''; // Clear trial hint
+                    btnGenerate.textContent = 'Generate Listings'; // Change button text
+                } else if (generationCount >= INITIAL_TRIAL_COUNT) {
+                    paywallTitle.textContent = 'Trial Ended: Unlock Full Access';
+                    paywallDesc.innerHTML = `You've used your ${INITIAL_TRIAL_COUNT} free generations. Get **lifetime access** now for a one-time payment of <strong>$47</strong> to continue generating listings!`;
+                    paypalButtonContainer.style.display = 'block'; // Show PayPal buttons
+                    couponSection.style.display = 'flex'; // Show coupon section
+                    paywallCard.style.display = 'block';
+                    appSection.style.display = 'none'; // Hide the main app
+                    scrollToElement(paywallCard); // Scroll to the paywall
+                    trialHintSpan.textContent = `(Trial Ended)`;
+                    btnGenerate.textContent = 'Generate Listings'; // Ensure button text is correct
+                } else {
+                    paywallTitle.textContent = `Unlock Lifetime Access`; // Default title for pre-trial
+                    paywallDesc.innerHTML = `Secure checkout via PayPal. Activation is instant and linked directly to your browser for seamless use.`; // Default desc
+                    paypalButtonContainer.style.display = 'block'; // Keep PayPal buttons visible during trial
+                    couponSection.style.display = 'flex'; // Show coupon section
+                    paywallCard.style.display = 'block';
+                    appSection.style.display = 'block'; // Show the main app during trial
+                    trialHintSpan.textContent = `(${INITIAL_TRIAL_COUNT - generationCount} free left)`;
+                    btnGenerate.textContent = 'Generate Listings'; // Ensure button text is correct
+                }
+            }
+
+            /**
+             * renderPayPalButtons: Initializes and renders PayPal buttons.
+             * Uses a retry mechanism to ensure SDK is loaded.
+             */
+            function renderPayPalButtons() {
+                if (typeof paypal !== 'undefined') {
+                    if (!hasPaid) { // Only render if not already paid
+                        // Clear existing buttons to prevent duplicates if re-rendering
+                        paypalButtonContainer.innerHTML = '';
+
+                        paypal.Buttons({
+                            createOrder: function(data, actions) {
+                                let finalPrice = 47.00;
+                                // Apply coupon discount if a valid coupon is active
+                                if (localStorage.getItem('couponApplied') === 'true') {
+                                    finalPrice = parseFloat(localStorage.getItem('discountedPrice')) || 47.00;
+                                }
+                                return actions.order.create({
+                                    purchase_units: [{
+                                        amount: { value: finalPrice.toFixed(2) },
+                                        description: 'ListingBoost Pro - Lifetime Access'
+                                    }]
+                                });
+                            },
+                            onApprove: async function(data, actions) {
+                                toggleLoading(true);
+                                try {
+                                    const details = await actions.order.capture();
+                                    console.log('Payment captured:', details);
+                                    if (details.status === 'COMPLETED') {
+                                        localStorage.setItem('listingBoostProPaid', 'true');
+                                        hasPaid = true;
+                                        localStorage.removeItem('couponApplied'); // Clear coupon status on successful payment
+                                        localStorage.removeItem('discountedPrice');
+                                        updatePaywallUI(); // Update UI to paid state
+                                        showMessage(document.body, 'Payment Successful! Enjoy lifetime access!', 'success', 3000);
+                                        loadFormData(); // Load any saved form data
+                                    } else {
+                                        showMessage(paypalButtonContainer, 'Payment failed or was not completed. Please try again.', 'error');
+                                    }
+                                } catch (error) {
+                                    console.error('Error capturing payment:', error);
+                                    showMessage(paypalButtonContainer, 'An error occurred during payment. Please try again.', 'error');
+                                } finally {
+                                    toggleLoading(false);
+                                }
+                            },
+                            onCancel: function (data) {
+                                console.log('Payment cancelled:', data);
+                                showMessage(paypalButtonContainer, 'Payment cancelled. You need to complete payment to access the app.', 'info');
+                            },
+                            onError: function (err) {
+                                console.error('PayPal Buttons Error:', err);
+                                showMessage(paypalButtonContainer, 'An error occurred with PayPal. Please check your connection or try again.', 'error');
+                            }
+                        }).render('#paypal-button-container');
+                    }
+                    updatePaywallUI(); // Initial UI update after PayPal SDK is confirmed loaded
+                    loadFormData(); // Load form data once app visibility is determined
+                    applyCouponBtn.disabled = hasPaid; // Disable coupon button if paid
+                    couponInput.disabled = hasPaid; // Disable coupon input if paid
+                } else {
+                    console.log('PayPal SDK not yet loaded, retrying...');
+                    setTimeout(renderPayPalButtons, 100); // Retry every 100ms
+                }
+            }
+
+            // --- Initial Checks and Setup ---
+            renderPayPalButtons(); // Start the PayPal rendering and UI update process
+
+            // --- Event Listeners for Page Elements ---
+            scrollToAppBtn.addEventListener('click', () => {
+                // If not paid and trial is exhausted, trigger paywall
+                if (!hasPaid && generationCount >= INITIAL_TRIAL_COUNT) {
+                    updatePaywallUI();
+                } else {
+                    // Otherwise, scroll to the app section
+                    scrollToElement(appSection);
+                }
+            });
+
+
+            resetPaymentBtn.addEventListener('click', () => {
+                // Confirm with user before resetting
+                const confirmation = window.prompt("Are you sure you want to reset your access? This will remove payment status and trial count. Type 'yes' to confirm:");
+                if (confirmation && confirmation.toLowerCase() === 'yes') {
+                    localStorage.removeItem('listingBoostProPaid');
+                    localStorage.removeItem('listingBoostProGenerations');
+                    localStorage.removeItem('couponApplied');
+                    localStorage.removeItem('discountedPrice');
+                    generationCount = 0;
+                    hasPaid = false;
+                    updatePaywallUI(); // Reset UI state
+                    renderPayPalButtons(); // Re-render buttons if they were hidden
+                    loadFormData(); // Reload default data after reset
+                    showMessage(document.body, 'Access reset successfully! You can now use your trial generations again.', 'info', 3000);
+                }
+            });
+
+            applyCouponBtn.addEventListener('click', () => {
+                if (hasPaid) {
+                    showMessage(couponMsg, 'You already have lifetime access! No need for coupons.', 'info');
+                    return;
+                }
+                const enteredCoupon = couponInput.value.trim().toLowerCase();
+                // Simple mock coupon logic
+                if (enteredCoupon === 'boost20') { // Example coupon for 20% off
+                    const originalPrice = 47.00;
+                    const discountedPrice = originalPrice * 0.80; // 20% off
+                    localStorage.setItem('couponApplied', 'true');
+                    localStorage.setItem('discountedPrice', discountedPrice.toFixed(2));
+                    showMessage(couponMsg, `Coupon applied! New price: $${discountedPrice.toFixed(2)}`, 'success', 5000);
+                    // Re-render PayPal buttons to reflect new price
+                    renderPayPalButtons(); // This will clear and re-render the buttons
+                } else {
+                    localStorage.removeItem('couponApplied');
+                    localStorage.removeItem('discountedPrice');
+                    showMessage(couponMsg, 'Invalid coupon code.', 'error', 3000);
+                    renderPayPalButtons(); // Re-render to ensure original price if coupon was removed
+                }
+            });
+
+            // Display UTM parameters if present
+            function displayUtmParams() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const utmSource = urlParams.get('utm_source');
+                const utmMedium = urlParams.get('utm_medium');
+                const utmCampaign = urlParams.get('utm_campaign');
+                const utmContent = urlParams.get('utm_content');
+
+                let utmText = '';
+                if (utmSource || utmMedium || utmCampaign || utmContent) {
+                    utmText = 'Campaign: ';
+                    if (utmSource) utmText += `Source: ${utmSource} `;
+                    if (utmMedium) utmText += `Medium: ${utmMedium} `;
+                    if (utmCampaign) utmText += `Campaign: ${utmCampaign} `;
+                    if (utmContent) utmText += `Content: ${utmContent}`;
+                }
+                utmNote.textContent = utmText.trim();
+            }
+            displayUtmParams(); // Call on load
+
+
+            // --- Form Auto-Save & Load Logic ---
+            /**
+             * saveFormData: Saves all current form field values to local storage.
+             */
+            function saveFormData() {
+                const formData = {};
+                formFields.forEach(field => {
+                    formData[field.name] = field.value;
+                });
+                localStorage.setItem('listingBoostProFormData', JSON.stringify(formData));
+                autosaveStateSpan.textContent = '💾 Auto-saved';
+                setTimeout(() => {
+                    autosaveStateSpan.textContent = '';
+                }, 2000);
+            }
+
+            /**
+             * loadFormData: Loads saved form data from local storage and populates the form fields.
+             * If no saved data, pre-fills with demo content.
+             */
+            function loadFormData() {
+                const savedData = localStorage.getItem('listingBoostProFormData');
+                if (savedData) {
+                    const formData = JSON.parse(savedData);
+                    formFields.forEach(field => {
+                        if (formData[field.name] !== undefined) {
+                            field.value = formData[field.name];
+                        }
+                    });
+                } else {
+                    // Pre-fill with compelling example data for demo
+                    addressInput.value = defaultPropertyData.address;
+                    priceInput.value = defaultPropertyData.price;
+                    bedroomsInput.value = defaultPropertyData.bedrooms;
+                    bathroomsInput.value = defaultPropertyData.bathrooms;
+                    sqftInput.value = defaultPropertyData.sqft;
+                    propertyTypeSelect.value = defaultPropertyData.propertyType;
+                    featuresTextarea.value = defaultPropertyData.features;
+                    highlightsTextarea.value = defaultPropertyData.highlights;
+                    notesTextarea.value = defaultPropertyData.notes;
+                    saveFormData(); // Save this default data immediately
+                }
+            }
+
+            // Attach an 'input' event listener to each form field for auto-saving
+            formFields.forEach(field => {
+                field.addEventListener('input', saveFormData);
+            });
+
+
+            // --- URL Import Functionality (Mocked for MVP) ---
+            btnScrape.addEventListener('click', async () => {
+                const url = urlInput.value.trim();
+                if (!url) {
+                    showMessage(urlStatus, 'Please enter a URL to import.', 'error');
+                    return;
+                }
+
+                showMessage(urlStatus, 'Importing data from URL (simulated)...', 'info');
+                toggleLoading(true);
+
+                try {
+                    // This `fetch` call points to your Vercel serverless function (`api/scrape-url.js`).
+                    // For a real setup, ensure this backend function is deployed on Vercel.
+                    // For demo purposes, we'll always use mock data here.
+                    const response = await fetch('/api/scrape-url', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ url: url })
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok && result.success && result.data) {
+                         // Attempt to use scraped data if available and valid
+                        addressInput.value = result.data.address || defaultPropertyData.address;
+                        priceInput.value = result.data.price ? parseFloat(result.data.price.replace(/[^0-9.]/g, '')) : defaultPropertyData.price;
+                        bedroomsInput.value = result.data.bedrooms || defaultPropertyData.bedrooms;
+                        bathroomsInput.value = result.data.bathrooms || defaultPropertyData.bathrooms;
+                        sqftInput.value = result.data.sqft ? parseFloat(result.data.sqft.replace(/[^0-9.]/g, '')) : defaultPropertyData.sqft;
+                        // Use result.data.propertyType if available, else fallback to default or 'Single Family'
+                        propertyTypeSelect.value = result.data.propertyType || defaultPropertyData.propertyType;
+                        featuresTextarea.value = result.data.features ? (Array.isArray(result.data.features) ? `- ${result.data.features.join('\n- ')}` : result.data.features) : defaultPropertyData.features;
+                        // Assuming highlights and notes might not be scraped, keep default or empty
+                        highlightsTextarea.value = result.data.highlights || defaultPropertyData.highlights;
+                        notesTextarea.value = result.data.notes || defaultPropertyData.notes;
+
+                        showMessage(urlStatus, 'Data imported successfully! (using mock/scraped data)', 'success');
+                    } else {
+                        console.warn('URL Import API did not return expected data or failed. Using demo data.');
+                        showMessage(urlStatus, 'Failed to import from URL. Using compelling demo data to showcase the generator.', 'info');
+                        // Always fall back to compelling demo data if actual scrape fails or is empty
+                        addressInput.value = defaultPropertyData.address;
+                        priceInput.value = defaultPropertyData.price;
+                        bedroomsInput.value = defaultPropertyData.bedrooms;
+                        bathroomsInput.value = defaultPropertyData.bathrooms;
+                        sqftInput.value = defaultPropertyData.sqft;
+                        propertyTypeSelect.value = defaultPropertyData.propertyType;
+                        featuresTextarea.value = defaultPropertyData.features;
+                        highlightsTextarea.value = defaultPropertyData.highlights;
+                        notesTextarea.value = defaultPropertyData.notes;
+                    }
+                    saveFormData(); // Save the (potentially new) form data
+                } catch (error) {
+                    console.error('Error during URL import fetch:', error);
+                    showMessage(urlStatus, 'Network error or backend unreachable. Using compelling demo data to showcase the generator.', 'error');
+                    // Always fall back to compelling demo data if network fails
+                    addressInput.value = defaultPropertyData.address;
+                    priceInput.value = defaultPropertyData.price;
+                    bedroomsInput.value = defaultPropertyData.bedrooms;
+                    bathroomsInput.value = defaultPropertyData.bathrooms;
+                    sqftInput.value = defaultPropertyData.sqft;
+                    propertyTypeSelect.value = defaultPropertyData.propertyType;
+                    featuresTextarea.value = defaultPropertyData.features;
+                    highlightsTextarea.value = defaultPropertyData.highlights;
+                    notesTextarea.value = defaultPropertyData.notes;
+                    saveFormData();
+                } finally {
+                    toggleLoading(false);
+                }
+            });
+
+
+            // --- File Upload with Drag & Drop Functionality ---
+            dropZone.addEventListener('click', () => fileInput.click());
+            // Adjusted hover/leave to use CSS variables for consistency
+            dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = 'var(--acc)'; });
+            dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = 'rgba(255,255,255,.25)'; });
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = 'rgba(255,255,255,.25)';
+                handleFiles(e.dataTransfer.files);
+            });
+            fileInput.addEventListener('change', (e) => { handleFiles(e.target.files); });
+
+            /**
+             * handleFiles: Processes a FileList object. Mocks file analysis for MVP.
+             * @param {FileList} files - The FileList object containing selected files.
+             */
+            function handleFiles(files) {
+                if (files.length === 0) return;
+
+                let newFilesAdded = 0;
+                for (const file of files) {
+                    if (!uploadedFiles.some(f => f.name === file.name && f.size === file.size)) {
+                        uploadedFiles.push(file);
+                        newFilesAdded++;
+                    }
+                }
+                updateFileListUI();
+                if (newFilesAdded > 0) {
+                    showMessage(fileUploadStatus, `${newFilesAdded} new file(s) added. (File analysis is mocked for this demo)`, 'info');
+                } else {
+                    showMessage(fileUploadStatus, 'No new files added or duplicates detected.', 'info');
+                }
+                fileInput.value = ''; // Clear input to allow re-selection of same file
+            }
+
+            /**
+             * updateFileListUI: Renders the current list of uploaded files in the UI.
+             */
+            function updateFileListUI() {
+                fileListDiv.innerHTML = ''; // Clear previous list
+                if (uploadedFiles.length === 0) {
+                    fileListDiv.textContent = 'No files selected.';
+                    return;
+                }
+                const ul = document.createElement('ul');
+                ul.style.listStyle = 'none';
+                ul.style.paddingLeft = '0';
+                ul.style.marginTop = '0.5rem';
+
+                uploadedFiles.forEach((file, index) => {
+                    const li = document.createElement('li');
+                    li.style.display = 'flex';
+                    li.style.justifyContent = 'space-between';
+                    li.style.alignItems = 'center';
+                    li.style.background = 'rgba(255,255,255,0.05)';
+                    li.style.padding = '0.5rem 0.8rem';
+                    li.style.borderRadius = '8px';
+                    li.style.marginBottom = '5px';
+                    li.innerHTML = `
+                        <span style="font-size:0.9em;">${file.name} (${(file.size / 1024).toFixed(2)} KB)</span>
+                        <button style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:1.2em;" data-index="${index}">&times;</button>
+                    `;
+                    ul.appendChild(li);
+                });
+                fileListDiv.appendChild(ul);
+
+                // Add event listeners for remove buttons
+                ul.querySelectorAll('button').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const indexToRemove = parseInt(e.target.dataset.index);
+                        uploadedFiles.splice(indexToRemove, 1); // Remove from array
+                        updateFileListUI(); // Re-render list
+                        showMessage(fileUploadStatus, 'File removed.', 'info', 1500);
+                    });
+                });
+            }
+            updateFileListUI(); // Initial render for empty state
+
+
+            // --- AI Listing Generation Logic ---
+            btnGenerate.addEventListener('click', async () => {
+                // Check if user has paid or has remaining trials
+                if (!hasPaid && generationCount >= INITIAL_TRIAL_COUNT) {
+                    updatePaywallUI(); // Show payment gate and hide app
+                    return; // Stop generation
+                }
+
+                // Gather all form data
+                const propertyData = {
+                    address: addressInput.value.trim(),
+                    price: priceInput.value.trim(),
+                    bedrooms: bedroomsInput.value.trim(),
+                    bathrooms: bathroomsInput.value.trim(),
+                    sqft: sqftInput.value.trim(),
+                    propertyType: propertyTypeSelect.value.trim(),
+                    features: featuresTextarea.value.trim(),
+                    highlights: highlightsTextarea.value.trim(),
+                    notes: notesTextarea.value.trim(),
+                    uploadedFileNames: uploadedFiles.map(f => f.name).join(', ')
+                };
+
+                // Basic validation: Ensure essential fields are filled
+                if (!propertyData.address || !propertyData.features) {
+                    showMessage(generationStatus, 'Please fill in **Address** and **Detailed Features** to generate listings.', 'error');
+                    return;
+                }
+
+                // Show loading messages and spinner
+                showMessage(generationStatus, 'Generating your listings...', 'info');
+                toggleLoading(true);
+
+                // Clear previous output textareas
+                outMLS.value = '';
+                outSocial.value = '';
+                outEmail.value = '';
+
+                // Construct a comprehensive prompt for the AI model
+                const prompt = `Generate three types of real estate listings for the following property details.
+                Ensure the tone is professional, engaging, and highlights the property's best features.
+
+                Property Type: ${propertyData.propertyType}
+                Address: ${propertyData.address}
+                ${propertyData.price ? `Price: $${propertyData.price}` : ''}
+                ${propertyData.bedrooms ? `Bedrooms: ${propertyData.bedrooms}` : ''}
+                ${propertyData.bathrooms ? `Bathrooms: ${propertyData.bathrooms}` : ''}
+                ${propertyData.sqft ? `Square Footage: ${propertyData.sqft} sqft` : ''}
+                Key Features: ${propertyData.features}
+                ${propertyData.highlights ? `Neighborhood Highlights/Selling Points: ${propertyData.highlights}` : ''}
+                ${propertyData.notes ? `Additional Notes (for detailed description): ${propertyData.notes}` : ''}
+                ${propertyData.uploadedFileNames ? `\n(User has uploaded files like: ${propertyData.uploadedFileNames}. Imagine these files provide additional visual details and context, allowing you to enrich the descriptions with more specific features like 'gourmet kitchen with island' or 'expansive backyard perfect for entertaining' as appropriate for a high-end property.)` : ''}
+
+                Format your response strictly as follows, with three distinct sections separated by "---":
+
+                ---MLS Listing---
+                [MLS Listing Content Here: Max 300 words. Be concise, factual, use common real estate abbreviations (e.g., BR, BA, SF, LVT, HVAC, SS, GORGEOUS, EXPANSIVE, UPGRADED), focus on features, and include a strong hook and clear call to action. Highlight key selling points derived from the description and imagined file content. Example: "STUNNING 3BR/2.5BA home in desirable neighborhood. 2000 SF w/open concept. UPGRADED KITCHEN w/SS APPL. LVT FLRS. Spacious backyard w/patio. Mins to amenities. Must see!"]
+
+                ---Social Media Post---
+                [Engaging Social Media Post Content Here: Max 150 words. Use an exciting tone, plenty of relevant emojis (🏡✨🔑🌳💖🎉), and popular hashtags. Focus on lifestyle benefits and visual appeal. Call to action should be light and inviting. Example: "Dream home alert! 🏡✨ This stunning property at ${propertyData.address} offers ${propertyData.bedrooms} BR & ${propertyData.bathrooms} BA, spacious ${propertyData.sqft} sqft of luxury! Imagine relaxing by the cozy fireplace or entertaining in the expansive backyard. Don't miss out! Learn more & schedule a tour: [Link to listing] #DreamHome #RealEstate #LuxuryLiving #NewListing #HomeSweetHome"]
+
+                ---Email Marketing Copy---
+                [Compelling Email Marketing Copy Here: Max 400 words. Start with a captivating subject line. Use a persuasive tone, elaborate on benefits, and include a strong, clear call to action. Structure with an engaging introduction, bullet points for features, and a compelling closing. Example: "Subject: Your Dream Home Awaits at ${propertyData.address}!
+                Hi [Client Name],
+                Are you searching for the perfect blend of modern luxury and comfort? Look further! We're thrilled to present this exquisite property located at ${propertyData.address}... [Continue with detailed description, benefits, call to action]"]`;
+
+                try {
+                    let chatHistory = [];
+                    chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                    const payload = { contents: chatHistory };
+                    const apiKey = ""; // Canvas will automatically provide this API key at runtime
+
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+                    let retryCount = 0;
+                    const maxRetries = 5;
+                    const baseDelay = 1000; // 1 second for initial retry delay
+
+                    let response;
+                    let result;
+
+                    // Implement exponential backoff for robust API calling
+                    while (retryCount < maxRetries) {
+                        try {
+                            response = await fetch(apiUrl, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(payload)
+                            });
+
+                            if (response.status === 429) { // Too Many Requests (Rate Limit)
+                                const delay = baseDelay * Math.pow(2, retryCount); // Exponential delay
+                                console.warn(`Rate limit hit. Retrying in ${delay / 1000} seconds (retry ${retryCount + 1}/${maxRetries})...`);
+                                await new Promise(resolve => setTimeout(resolve, delay));
+                                retryCount++;
+                                continue; // Continue to the next iteration of the loop
+                            }
+
+                            result = await response.json(); // Parse the response JSON
+                            break; // If successful, break out of the retry loop
+                        } catch (error) {
+                            console.error(`Fetch error (retry ${retryCount + 1}/${maxRetries}):`, error);
+                            if (retryCount < maxRetries - 1) { // Only retry if not the last attempt
+                                const delay = baseDelay * Math.pow(2, retryCount);
+                                console.warn(`Fetch error. Retrying in ${delay / 1000} seconds...`);
+                                await new Promise(resolve => setTimeout(resolve, delay));
+                                retryCount++;
+                            } else {
+                                throw error; // Re-throw the error if max retries reached
+                            }
+                        }
+                    }
+
+                    // Check for valid API response structure
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const generatedText = result.candidates[0].content.parts[0].text;
+                        console.log("Full Generated Text:", generatedText); // Log full AI response for debugging
+
+                        // Parse the generated text using markers
+                        const mlsMatch = generatedText.match(/---MLS Listing---\n([\s\S]*?)(?=\n\n---Social Media Post---|---Email Marketing Copy---|$)/);
+                        const socialMatch = generatedText.match(/---Social Media Post---\n([\s\S]*?)(?=\n\n---Email Marketing Copy---|$)/);
+                        const emailMatch = generatedText.match(/---Email Marketing Copy---\n([\s\S]*?)$/);
+
+                        // Populate textareas. Trim whitespace and provide fallback message if parsing fails.
+                        outMLS.value = mlsMatch ? mlsMatch[1].trim() : 'Could not parse MLS listing. Please try generating again.';
+                        outSocial.value = socialMatch ? socialMatch[1].trim() : 'Could not parse Social Media post. Please try generating again.';
+                        outEmail.value = emailMatch ? emailMatch[1].trim() : 'Could not parse Email Marketing copy. Please try generating again.';
+
+                        showMessage(generationStatus, 'Listings generated successfully!', 'success', 2000);
+
+                        // If not paid, decrement trial count
+                        if (!hasPaid) {
+                            generationCount++;
+                            localStorage.setItem('listingBoostProGenerations', generationCount.toString());
+                            updatePaywallUI(); // Update the displayed trial count
+                        }
+
+                    } else {
+                        console.error('Unexpected API response structure or empty content:', result);
+                        showMessage(generationStatus, 'Could not generate listings. Unexpected response from AI. Try adjusting your input.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Final error generating listings after retries:', error);
+                    showMessage(generationStatus, 'An error occurred while communicating with the AI. Please ensure you have network access and try again.', 'error');
+                } finally {
+                    toggleLoading(false);
+                }
+            });
+
+
+            // --- Copy and Download Functionality ---
+            document.querySelectorAll('[data-copy]').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const targetId = e.target.dataset.copy;
+                    const textarea = document.querySelector(targetId);
+                    if (textarea && textarea.value) {
+                        textarea.select();
+                        try {
+                            document.execCommand('copy');
+                            showMessage(e.target, 'Copied!', 'success', 1000);
+                        } catch (err) {
+                            console.error('Failed to copy text:', err);
+                            showMessage(e.target, 'Copy failed. Please copy manually.', 'error', 2000);
+                        }
+                    } else {
+                        showMessage(e.target, 'Nothing to copy!', 'error', 1500);
+                    }
+                });
+            });
+
+            document.querySelectorAll('[data-download]').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const targetId = e.target.dataset.download;
+                    const filename = e.target.dataset.filename || 'download.txt';
+                    const text = document.querySelector(targetId).value;
+
+                    if (!text) {
+                        showMessage(e.target, 'Nothing to download!', 'error', 1500);
+                        return;
+                    }
+
+                    const blob = new Blob([text], { type: 'text/plain' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    showMessage(e.target, 'Downloaded!', 'success', 1000);
+                });
+            });
+
+            // --- Export All (.txt) Functionality ---
+            btnExportAll.addEventListener('click', () => {
+                const mlsContent = outMLS.value;
+                const socialContent = outSocial.value;
+                const emailContent = outEmail.value;
+
+                if (!mlsContent && !socialContent && !emailContent) {
+                    showMessage(generationStatus, 'No content to export!', 'error', 2000);
+                    return;
+                }
+
+                const allContent = `--- MLS Listing ---\n${mlsContent}\n\n--- Social Media Post ---\n${socialContent}\n\n--- Email Marketing Copy ---\n${emailContent}`;
+                const filename = 'ListingBoostPro_All_Listings.txt';
+
+                const blob = new Blob([allContent], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showMessage(generationStatus, 'All listings exported as TXT!', 'success', 2000);
+            });
+
+            // --- Export CSV (details) Functionality ---
+            btnExportCSV.addEventListener('click', () => {
+                const propertyData = {
+                    Address: addressInput.value.trim(),
+                    Price: priceInput.value.trim(),
+                    Bedrooms: bedroomsInput.value.trim(),
+                    Bathrooms: bathroomsInput.value.trim(),
+                    SqFt: sqftInput.value.trim(),
+                    PropertyType: propertyTypeSelect.value.trim(),
+                    Features: featuresTextarea.value.trim().replace(/"/g, '""'), // Escape quotes for CSV
+                    Highlights: highlightsTextarea.value.trim().replace(/"/g, '""'),
+                    Notes: notesTextarea.value.trim().replace(/"/g, '""')
+                };
+
+                if (!propertyData.Address && !propertyData.Features) { // Check for at least address or features
+                    showMessage(generationStatus, 'No property data to export to CSV!', 'error', 2000);
+                    return;
+                }
+
+                const headers = Object.keys(propertyData).join(',');
+                const values = Object.values(propertyData).map(val => `"${val}"`).join(','); // Wrap values in quotes
+                const csvContent = `${headers}\n${values}`;
+                const filename = 'ListingBoostPro_Property_Details.csv';
+
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showMessage(generationStatus, 'Property details exported as CSV!', 'success', 2000);
+            });
+
+            // --- Confirmation for window.confirm() replacement ---
+            // Replaced the simple confirm() with a custom message.
+            window.confirm = (message) => {
+                return prompt(message + "\n\nType 'yes' to confirm:") === 'yes';
+            };
+        }); // End of DOMContentLoaded
+    </script>
+</body>
+</html>
